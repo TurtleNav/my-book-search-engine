@@ -1,3 +1,7 @@
+/*
+  Refactor of the RESTful implementation found in controllers/user-controller.js
+*/
+
 const {User} = require("../models");
 
 const {signToken, AuthenticationError} = require("../utils/auth");
@@ -16,10 +20,10 @@ const resolvers = {
     createUser: async(parent, {username, email, password}) => {
       const user = await User.create({username, email, password});
       const token = signToken(user);
-      return {token, user}
+      return {token, user};
     },
-    login: async(parent, {email, password}) => {
-      const user = await User.findOne({email});
+    login: async(parent, {username, email, password}) => {
+      const user = await User.findOne({$or: [{username}, {email}]});
       if (!user) {
         throw AuthenticationError("A user with those login credentials does not exis");
       }
@@ -28,6 +32,22 @@ const resolvers = {
       if (!(await user.isCorrectPassword(password))) {
         throw AuthenticationError("The provided password is invalid!")
       }
+      const token = signToken(user);
+      return {token, user};
+    },
+    saveBook: async(parent, {book}, context) => {
+      if (context.user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          context.user._id,
+          {$addToSet: {savedBooks: book}},
+          {new: true}
+        );
+        if (!updatedUser) {
+          throw AuthenticationError("Can't save a book since a user with that id doesn't exist");
+        }
+        return updatedUser;
+      }
+      throw AuthenticationError("A user with those login credentials does not exis");
     }
   }
 }
