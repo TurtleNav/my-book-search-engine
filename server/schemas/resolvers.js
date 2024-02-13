@@ -8,22 +8,14 @@ const {signToken, AuthenticationError} = require("../utils/auth");
 
 const resolvers = {
   Query: {
-    user: async (parent, args, context) => {
+    me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findById(context.user._id);
-        return userData;
+        return await User.findById(context.user._id).populate('savedBooks');
       }
-      throw AuthenticationError('You need to be logged in!');
-    }
+      throw AuthenticationError;
+    },
   },
   Mutation: {
-    createUser: async(parent, {username, email, password}) => {
-      console.log("hiiii");
-      const user = await User.create({username, email, password});
-      console.log("user -> ", user);
-      const token = signToken(user);
-      return {token, user};
-    },
     login: async(parent, {username, email, password}) => {
       const user = await User.findOne({$or: [{username}, {email}]});
       if (!user) {
@@ -34,6 +26,11 @@ const resolvers = {
       if (!(await user.isCorrectPassword(password))) {
         throw AuthenticationError("The provided password is invalid!")
       }
+      const token = signToken(user);
+      return {token, user};
+    },
+    addUser: async(parent, {username, email, password}) => {
+      const user = await User.create({username, email, password});
       const token = signToken(user);
       return {token, user};
     },
@@ -51,11 +48,11 @@ const resolvers = {
       }
       throw AuthenticationError("A user with those login credentials does not exist");
     },
-    deleteBook: async(parent, {bookId}, context) => {
+    removeBook: async(parent, {bookId}, context) => {
       if (context.user) {
         const updatedUser = await User.findByIdAndUpdate(
           context.user._id,
-          {$pull: {savedBooks: bookId}},
+          {$pull: {savedBooks: { bookId }}},
           {new: true}
         );
         if (!updatedUser) {
