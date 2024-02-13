@@ -20,12 +20,16 @@ import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
   // use our graphql query and mutation
-  const {loading, data} = useQuery(GET_ME);   // equivalent to ../utils/API/getMe
+
+
+  // Equivalent to ../utils/API/getMe (for RESTful)
+  // refetch query to update displayed books
+  const {loading, data} = useQuery(GET_ME, {
+    refetchQueries: [GET_ME, "Me"]
+  });
   const [deleteBook, {error}] = useMutation(REMOVE_BOOK); // equivalent to ../utils/API/deleteBook
 
-  const userData = data?.currentUser || {};
-
-  console.log('userData -> ', userData);
+  const userData = data?.currentUser || {}; // set to empty token if not authenticated
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
