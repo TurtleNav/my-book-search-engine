@@ -12,16 +12,16 @@ import {
 
 // Changed to these graphql queriesmutations
 import { useQuery, useMutation } from '@apollo/client';
-import { QUERY_CURRENT_USER } from '../utils/queries';
-import { DELETE_BOOK } from '../utils/mutations';
+import { GET_ME } from '../utils/queries';
+import { REMOVE_BOOK } from '../utils/mutations';
 
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
   // use our graphql query and mutation
-  const {loading, data} = useQuery(QUERY_CURRENT_USER);   // equivalent to ../utils/API/getMe
-  const [deleteBook, {error}] = useMutation(DELETE_BOOK); // equivalent to ../utils/API/deleteBook
+  const {loading, data} = useQuery(GET_ME);   // equivalent to ../utils/API/getMe
+  const [deleteBook, {error}] = useMutation(REMOVE_BOOK); // equivalent to ../utils/API/deleteBook
 
   const userData = data?.currentUser || {};
 
