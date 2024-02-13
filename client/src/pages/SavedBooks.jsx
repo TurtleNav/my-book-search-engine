@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+//import { useState, useEffect } from 'react';
 import {
   Container,
   Card,
@@ -24,34 +24,23 @@ const SavedBooks = () => {
 
   // Equivalent to ../utils/API/getMe (for RESTful)
   // refetch query to update displayed books
-  const {loading, data} = useQuery(GET_ME, {
+  const {loading, data} = useQuery(GET_ME);
+
+  const [deleteBook, {error}] = useMutation(REMOVE_BOOK, {
     refetchQueries: [GET_ME, "Me"]
-  });
-  const [deleteBook, {error}] = useMutation(REMOVE_BOOK); // equivalent to ../utils/API/deleteBook
+  }); // equivalent to ../utils/API/deleteBook
 
-  const userData = data?.currentUser || {}; // set to empty token if not authenticated
-
+  const userData = data?.me
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-    if (!token) {
-      return false;
-    }
-
-    try {
-      const response = await deleteBook({variables: {bookId}});
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      // upon success, remove book's id from localStorage
-      removeBookId(bookId);
-    } catch (err) {
-      console.error(err);
-    }
+    await deleteBook({variables: {bookId}});
   };
+
+  // if data isn't here yet, say so
+  if (loading) {
+    return <h2>LOADING...</h2>;
+  }
 
   return (
     <>
