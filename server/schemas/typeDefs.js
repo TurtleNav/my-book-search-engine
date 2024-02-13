@@ -22,7 +22,7 @@ const typeDefs = `
   }
 
   type Query {
-    user: User
+    user: [User]
     book: Book
     books: [Book]
   }
@@ -30,8 +30,8 @@ const typeDefs = `
   type Mutation {
     createUser(username: String!, email: String!, password: String!): Auth
     login(username: String!, email: String!, password: String!): Auth
-    saveBook(bookId: ID!): Book
-    deleteBook(bookId: ID!): Book
+    saveBook(bookId: ID!): User
+    deleteBook(bookId: String!): User
   }
 `
 module.exports = typeDefs;

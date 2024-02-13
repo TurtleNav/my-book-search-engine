@@ -10,7 +10,7 @@ const resolvers = {
   Query: {
     user: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findById(context.user._id).select("-__v -password");
+        const userData = await User.findById(context.user._id);
         return userData;
       }
       throw AuthenticationError('You need to be logged in!');
@@ -51,11 +51,11 @@ const resolvers = {
       }
       throw AuthenticationError("A user with those login credentials does not exist");
     },
-    deleteBook: async(parent, {book}, context) => {
+    deleteBook: async(parent, {bookId}, context) => {
       if (context.user) {
         const updatedUser = await User.findByIdAndUpdate(
           context.user._id,
-          {$pull: {savedBooks: book}},
+          {$pull: {savedBooks: bookId}},
           {new: true}
         );
         if (!updatedUser) {
