@@ -30,3 +30,7 @@ export const SAVE_BOOK = gql`
     $description: description,
     )
 `;
+
+export const DELETE_BOOK = gql`
+    mutation deleteBook(bookId: ID!): Book
+`

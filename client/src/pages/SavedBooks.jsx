@@ -10,9 +10,10 @@ import {
 // No longer need these
 // import { getMe, deleteBook } from '../utils/API';
 
-// Changed to these graphql mutations
+// Changed to these graphql queriesmutations
 import {useQuery, useMutation} from '@apollo/client';
 import { QUERY_CURRENT_USER } from '../utils/queries';
+import { DELETE_BOOK } from '../utils/mutations';
 
 
 

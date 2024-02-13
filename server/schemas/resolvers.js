@@ -50,6 +50,19 @@ const resolvers = {
         return updatedUser;
       }
       throw AuthenticationError("A user with those login credentials does not exis");
+    },
+    deleteBook: async(parent, {book}, context) => {
+      if (context.user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          context.user._id,
+          {$pull: {savedBooks: book}},
+          {new: true}
+        );
+        if (!updatedUser) {
+          throw AuthenticationError("Can't delete a saved book since a user with that id doesn't exist");
+        }
+        return updatedUser;
+      }
     }
   }
 }
