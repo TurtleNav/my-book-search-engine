@@ -7,7 +7,15 @@ import {
   Col
 } from 'react-bootstrap';
 
-import { getMe, deleteBook } from '../utils/API';
+// No longer need these
+// import { getMe, deleteBook } from '../utils/API';
+
+// Changed to these graphql mutations
+import {useQuery, useMutation} from '@apollo/client';
+import { QUERY_CURRENT_USER } from '../utils/queries';
+
+
+
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
