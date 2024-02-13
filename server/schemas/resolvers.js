@@ -49,7 +49,7 @@ const resolvers = {
         }
         return updatedUser;
       }
-      throw AuthenticationError("A user with those login credentials does not exis");
+      throw AuthenticationError("A user with those login credentials does not exist");
     },
     deleteBook: async(parent, {book}, context) => {
       if (context.user) {
@@ -63,6 +63,8 @@ const resolvers = {
         }
         return updatedUser;
       }
+      throw AuthenticationError("A user with those login credentials does not exist");
+
     }
   }
 }

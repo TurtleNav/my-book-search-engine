@@ -11,45 +11,19 @@ import {
 // import { getMe, deleteBook } from '../utils/API';
 
 // Changed to these graphql queriesmutations
-import {useQuery, useMutation} from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { QUERY_CURRENT_USER } from '../utils/queries';
 import { DELETE_BOOK } from '../utils/mutations';
-
-
 
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
+  // use our graphql query and mutation
+  const {loading, data} = useQuery(QUERY_CURRENT_USER);   // equivalent to ../utils/API/getMe
+  const [deleteBook, {error}] = useMutation(DELETE_BOOK); // equivalent to ../utils/API/deleteBook
 
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
-
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = await getMe(token);
-
-        if (!response.ok) {
-          throw new Error('something went wrong!');
-        }
-
-        const user = await response.json();
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    getUserData();
-  }, [userDataLength]);
+  const userData = data?.currentUser || {};
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -60,25 +34,18 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
+      const response = await deleteBook({variables: {bookId}});
 
       if (!response.ok) {
         throw new Error('something went wrong!');
       }
 
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
   };
-
-  // if data isn't here yet, say so
-  if (!userDataLength) {
-    return <h2>LOADING...</h2>;
-  }
 
   return (
     <>
