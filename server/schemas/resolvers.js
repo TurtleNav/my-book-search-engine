@@ -10,28 +10,29 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        return await User.findById(context.user._id).populate('savedBooks');
+        return await User.findById(context.user._id);
       }
-      throw AuthenticationError;
     },
   },
   Mutation: {
     login: async(parent, {username, email, password}) => {
       const user = await User.findOne({$or: [{username}, {email}]});
       if (!user) {
-        throw AuthenticationError("A user with those login credentials does not exis");
+        throw AuthenticationError;
       }
       // Check if password is not valid using the already created isCorrectPassword method
       // from the model then raise authentication error
       if (!(await user.isCorrectPassword(password))) {
-        throw AuthenticationError("The provided password is invalid!")
+        throw AuthenticationError;
       }
       const token = signToken(user);
       return {token, user};
     },
-    addUser: async(parent, {username, email, password}) => {
+    createUser: async(parent, {username, email, password}) => {
+      console.log("Attempting to create a user")
       const user = await User.create({username, email, password});
       const token = signToken(user);
+      console.log('token -> ', token);
       return {token, user};
     },
     saveBook: async(parent, {book}, context) => {
@@ -42,11 +43,11 @@ const resolvers = {
           {new: true}
         );
         if (!updatedUser) {
-          throw AuthenticationError("Can't save a book since a user with that id doesn't exist");
+          throw AuthenticationError;
         }
         return updatedUser;
       }
-      throw AuthenticationError("A user with those login credentials does not exist");
+      throw AuthenticationError;
     },
     removeBook: async(parent, {bookId}, context) => {
       if (context.user) {
@@ -56,11 +57,11 @@ const resolvers = {
           {new: true}
         );
         if (!updatedUser) {
-          throw AuthenticationError("Can't delete a saved book since a user with that id doesn't exist");
+          throw AuthenticationError;
         }
         return updatedUser;
       }
-      throw AuthenticationError("A user with those login credentials does not exist");
+      throw AuthenticationError;
 
     }
   }
